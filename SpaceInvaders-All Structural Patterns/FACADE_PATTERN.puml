@@ -1,0 +1,130 @@
+@startuml Facade Pattern - Before and After
+
+title Facade Pattern: Before vs After
+
+package "BEFORE - Without Facade (Complexity Exposed)" {
+    class Board {
+        -aliens: ArrayList<Alien>
+        -player: Player
+        -shot: Shot
+        
+        +paint(g: Graphics)
+        +drawAliens(g: Graphics)
+        +drawPlayer(g: Graphics)
+        +drawShot(g: Graphics)
+        +drawBombing(g: Graphics)
+        +gameOver()
+        +gameInit()
+    }
+    
+    class Client {
+        +paint()
+    }
+    
+    Client --> Board: calls paint()
+    note right of Client
+        Board exposes complex rendering methods:
+        - drawAliens()
+        - drawPlayer()
+        - drawShot()
+        - drawBombing()
+        - drawGameEnd()
+        
+        Client must understand and coordinate
+        all these methods. High coupling!
+    end note
+    
+    note right of Board
+        paint() method contains all rendering logic:
+        - Clear screen
+        - Draw boundary
+        - Draw aliens (loop with collision)
+        - Draw player (with death check)
+        - Draw shots
+        - Draw bombs (nested loops)
+        - Sync display
+        
+        ~50+ lines of complex rendering code
+        in a single method!
+    end note
+}
+
+package "AFTER - With Facade Pattern (Simplified)" {
+    class GameRenderer {
+        -panel: JPanel
+        -dimension: Dimension
+        
+        +GameRenderer(panel: JPanel, d: Dimension)
+        +renderGameplay(g: Graphics, aliens, player, shot, expl): void
+        +renderGameOver(g: Graphics, hasWon, message): void
+        +finishRendering(g: Graphics): void
+        -clearScreen(g: Graphics): void
+        -drawGameBoundary(g: Graphics): void
+        -drawAliens(g: Graphics, aliens): void
+        -drawPlayer(g: Graphics, player): void
+        -drawShot(g: Graphics, shot): void
+        -drawBombs(g: Graphics, aliens, expl): void
+        -renderEndGameMessage(g: Graphics, hasWon, message): void
+    }
+    
+    class Board {
+        -renderer: GameRenderer
+        -aliens: ArrayList<Alien>
+        -player: Player
+        -shot: Shot
+        
+        +Board()
+        +paint(g: Graphics)
+        +gameOver()
+        +gameInit()
+    }
+    
+    class Client {
+        +paint()
+    }
+    
+    Client --> Board: calls paint()
+    Board --> GameRenderer: uses facade
+    
+    note right of GameRenderer
+        Facade provides clean public interface:
+        
+        1. renderGameplay()
+           - Orchestrates all gameplay rendering
+           - Single method call!
+        
+        2. renderGameOver()
+           - Handles end-game screen
+        
+        3. finishRendering()
+           - Cleanup
+        
+        All complex logic hidden in private methods
+    end note
+    
+    note right of Board
+        paint() now simplified:
+        
+        if (ingame) {
+            renderer.renderGameplay(g, ...);
+            if (player.isDying()) {
+                // handle death
+            }
+        }
+        renderer.finishRendering(g);
+        
+        ~10 lines vs 50+ before!
+        Much cleaner and easier to understand.
+    end note
+}
+
+note bottom
+    FACADE PATTERN BENEFITS:
+    - Hides complex subsystem complexity
+    - Provides single, unified interface
+    - Reduces coupling between Board and rendering details
+    - Makes code more maintainable and testable
+    - Client only sees simple facade methods
+end note
+
+@enduml

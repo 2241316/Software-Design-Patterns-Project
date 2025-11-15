@@ -1,0 +1,100 @@
+@startuml Flyweight Pattern - Before and After
+
+title Flyweight Pattern: Before vs After
+
+package "BEFORE - Without Flyweight (Memory Waste)" {
+    class Alien1 {
+        -image: Image (alien.png)
+        -x, y: int
+    }
+    
+    class Alien2 {
+        -image: Image (alien.png)
+        -x, y: int
+    }
+    
+    class Alien3 {
+        -image: Image (alien.png)
+        -x, y: int
+    }
+    
+    class Player {
+        -image: Image (craft.png)
+        -x, y: int
+    }
+    
+    class Shot {
+        -image: Image (shot.png)
+        -x, y: int
+    }
+    
+    class Bomb {
+        -image: Image (bomb.png)
+        -x, y: int
+    }
+    
+    note right of Alien1
+        Each sprite loads its own image
+        Result: 24 aliens × 1 image = 24 copies
+        + Player image = 25 copies
+        + Shot images = multiple copies
+        TOTAL: 30+ image objects in memory!
+    end note
+}
+
+package "AFTER - With Flyweight Pattern (Memory Optimized)" {
+    class ImageCache {
+        -{static} instance: ImageCache
+        -imageCache: Map<String, Image>
+        +{static} getInstance(): ImageCache
+        +getImage(path: String): Image
+        -loadImage(path: String): Image
+    }
+    
+    class Alien {
+        -x, y: int
+        +Alien(x: int, y: int)
+        +clone(): Alien
+    }
+    
+    class Player {
+        -x, y: int
+        +Player()
+    }
+    
+    class Shot {
+        -x, y: int
+        +Shot(x: int, y: int)
+    }
+    
+    class Bomb {
+        -x, y: int
+        +Bomb(x: int, y: int)
+    }
+    
+    Alien --|> ImageCache : uses
+    Player --|> ImageCache : uses
+    Shot --|> ImageCache : uses
+    Bomb --|> ImageCache : uses
+    
+    note right of ImageCache
+        Singleton pattern:
+        - All sprites share ONE ImageCache instance
+        - Cache stores images in HashMap
+        
+        Result: 5-6 unique images, reused by all sprites
+        TOTAL: ~6 image objects in memory!
+        
+        Memory saved: ~80-90%
+    end note
+}
+
+note bottom
+    FLYWEIGHT PATTERN BENEFIT:
+    - Intrinsic state (shared): Image objects
+    - Extrinsic state (unique): Position (x, y)
+    - All 24+ sprites share the same ~6 images
+    - Massive memory savings!
+end note
+
+@enduml
