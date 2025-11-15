@@ -5,9 +5,9 @@ public class Won extends Sprite implements Commons, Cloneable {
     private int width;
 
     public Won() {
-        ImageIcon ii = new ImageIcon(this.getClass().getResource(wonImg));
-        width = ii.getImage().getWidth(null);
-        setImage(ii.getImage());
+        java.awt.Image img = ImageCache.getInstance().getImage(wonImg);
+        width = img.getWidth(null);
+        setImage(img);
         setX(0);
         setY(0);
     }

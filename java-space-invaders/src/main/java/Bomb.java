@@ -3,36 +3,36 @@ import javax.swing.ImageIcon;
 public class Bomb implements Cloneable {
     private boolean destroyed;
     private int x, y;
-    private final String bombImg = "/img/explosion.png";
+    private final String bombImg = "/img/bomb.png";
+    private final String explosionImg = "/img/explosion.png";
     private ImageIcon image;
+    
     public Bomb(int x, int y) {
         setX(x);
         setY(y);
         setDestroyed(true);
-            try {
-                java.net.URL imgURL = this.getClass().getResource(bombImg);
-                if (imgURL != null) {
-                    image = new ImageIcon(imgURL);
-                } else {
-                    System.err.println("Warning: Could not find resource: " + bombImg);
-                    // Create a placeholder 5x5 image
-                    java.awt.image.BufferedImage bi = new java.awt.image.BufferedImage(5, 5, java.awt.image.BufferedImage.TYPE_INT_RGB);
-                    image = new ImageIcon(bi);
-                }
-            } catch (Exception e) {
-                System.err.println("Error loading image: " + bombImg);
-                e.printStackTrace();
-                java.awt.image.BufferedImage bi = new java.awt.image.BufferedImage(5, 5, java.awt.image.BufferedImage.TYPE_INT_RGB);
-                image = new ImageIcon(bi);
-            }
+        image = new ImageIcon(ImageCache.getInstance().getImage(bombImg));
     }
+    
+    public void explode() {
+        // Switch to explosion image when bomb detonates
+        image = new ImageIcon(ImageCache.getInstance().getImage(explosionImg));
+    }
+    
     public boolean isDestroyed() { return destroyed; }
-    public void setDestroyed(boolean status) { destroyed = status; }
+    public void setDestroyed(boolean status) { 
+        destroyed = status;
+        // When bomb becomes active (destroyed=false), ensure it uses bomb image
+        if (!destroyed) {
+            image = new ImageIcon(ImageCache.getInstance().getImage(bombImg));
+        }
+    }
     public void setX(int newX) { x = newX; }
     public void setY(int newY) { y = newY; }
     public int getX() { return x; }
     public int getY() { return y; }
     public ImageIcon getImage() { return image; }
+    
     @Override
     public Bomb clone() {
         try {
@@ -41,5 +41,5 @@ public class Bomb implements Cloneable {
             throw new RuntimeException(e);
         }
     }
-    // COMMENT: Prototype pattern applied
+    // COMMENT: Flyweight pattern - shares images via ImageCache
 }

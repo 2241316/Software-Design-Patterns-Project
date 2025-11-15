@@ -245,8 +245,8 @@ public class Board extends JPanel implements Runnable, Commons {
                 if (bombX >= (playerX) && bombX <= (playerX + PLAYER_WIDTH)
                         && bombY >= (playerY)
                         && bombY <= (playerY + PLAYER_HEIGHT)) {
-                    ImageIcon ii = new ImageIcon(this.getClass().getResource(expl));
-                    player.setImage(ii.getImage());
+                    b.explode();
+                    player.setImage(ImageCache.getInstance().getImage("/img/explosion.png"));
                     player.setDying(true);
                     b.setDestroyed(true);
                 }
@@ -254,6 +254,7 @@ public class Board extends JPanel implements Runnable, Commons {
             if (!b.isDestroyed()) {
                 b.setY(b.getY() + 1);
                 if (b.getY() >= GROUND - BOMB_HEIGHT) {
+                    b.explode();
                     b.setDestroyed(true);
                 }
             }

@@ -7,9 +7,9 @@ public class Player extends Sprite implements Commons {
     private final String playerImg = "/img/craft.png";
     private int width;
     public Player() {
-        ImageIcon ii = new ImageIcon(this.getClass().getResource(playerImg));
-        width = ii.getImage().getWidth(null);
-        setImage(ii.getImage());
+        java.awt.Image img = ImageCache.getInstance().getImage(playerImg);
+        width = img.getWidth(null);
+        setImage(img);
         setX(STARTX);
         setY(STARTY);
     }
