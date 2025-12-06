@@ -1,0 +1,40 @@
+### Changes Summary - Space Invaders Project
+
+This document outlines the modifications and additions made to the project to incorporate **Behavioral Design Patterns** (State and Template Method) while properly documenting existing patterns.
+
+#### 1. New Packages and Files (State Pattern)
+Location: `src/main/java/behavioral/state/`
+
+*   **`GameState.java`**: Interface defining the contract for game states (`handleInput()`, `update()`).
+*   **`GameBehavior.java`**: Interface allowing states to trigger core game loop actions.
+*   **`MenuState.java`**: Concrete state representing the game menu.
+*   **`PlayingState.java`**: Concrete state representing the active gameplay. It drives the `Board.cycle()` method.
+*   **`PauseState.java`**: Concrete state representing the game paused.
+*   **`GameOverState.java`**: Concrete state representing the game over screen. It triggers `Board.gameOverLogic()`.
+*   **`StateManager.java`**: Context class that manages the active state and transitions.
+
+#### 2. Modified Logic (Template Method Pattern)
+Location: `src/main/java/` (Default Package)
+
+*   **`Alien.java` (Abstract Class)**: Refactored to be **Abstract**.
+    *   **Template Method**: `act(int direction)` now defines the skeleton of movement.
+    *   **Hook Method**: `protected abstract void performMove(int direction)` is the step subclasses must implement.
+*   **`StraightAlien.java`**: New concrete subclass. Implements `performMove` for standard side-to-side movement.
+*   **`ZigZagAlien.java`**: New concrete subclass. Implements `performMove` for a wave-like movement pattern.
+
+#### 3. Modified Existing Files
+*   **`src/main/java/Board.java`**:
+    *   **State Pattern Integration**: Added `StateManager`. The `run()` loop now delegates to `stateManager.update()` instead of calling `animationCycle()` directly.
+    *   **Template Method Integration**: `gameInit()` now instantiates `StraightAlien` (concrete class) instead of the abstract `Alien`.
+    *   **Documentation**: Added explicit `// PATTERN: [PatternName]` comments throughout the file to identify Adapter, Facade, State, Template Method, Prototype, Factory Method, and Iterator patterns.
+
+#### 4. Architecture
+The project is now separated into a dedicated "SpaceInvaders-Behavioral Patterns" directory to distinguish it from the previous "Structural Patterns" version.
+
+#### 5. Code Comments
+Explicit comments have been added to:
+*   `Board.java` (Adapter, Facade, State, Template, Prototype, Factory, Iterator)
+*   `Alien.java` (Prototype, Template Method)
+*   `GameRenderer.java` (Facade)
+*   `ImageCache.java` (Flyweight)
+*   `AlienFactory.java` (Factory Method)

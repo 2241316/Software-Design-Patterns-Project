@@ -1,0 +1,125 @@
+@startuml Original Code - Before All Patterns
+
+title Space Invaders: Original Code Structure (Before Patterns)
+
+class Board {
+    -aliens: ArrayList<Alien>
+    -player: Player
+    -shot: Shot
+    -gameend: GameOver
+    -vunnet: Won
+    -alienX: int
+    -alienY: int
+    -direction: int
+    -deaths: int
+    -ingame: boolean
+    -havewon: boolean
+    
+    +Board()
+    +paint(g: Graphics)
+    +drawAliens(g: Graphics)
+    +drawPlayer(g: Graphics)
+    +drawShot(g: Graphics)
+    +drawBombing(g: Graphics)
+    +gameOver()
+    +gameInit()
+    +animationCycle()
+    +run()
+}
+
+class Alien {
+    -bomb: Bomb
+    +Alien(x: int, y: int)
+    +getBomb(): Bomb
+    +act(direction: int)
+}
+
+class Player {
+    -x: int
+    -y: int
+    +Player()
+    +act()
+    +keyPressed(e: KeyEvent)
+    +keyReleased(e: KeyEvent)
+}
+
+class Shot {
+    -x: int
+    -y: int
+    +Shot()
+    +Shot(x: int, y: int)
+}
+
+class Bomb {
+    -destroyed: boolean
+    -x, y: int
+    -image: ImageIcon
+    +Bomb(x: int, y: int)
+    +explode()
+    +isDestroyed(): boolean
+    +setDestroyed(status: boolean)
+}
+
+class GameOver {
+    +GameOver()
+    +getImage(): Image
+}
+
+class Won {
+    +Won()
+    +getImage(): Image
+}
+
+class Sprite {
+    #visible: boolean
+    #image: Image
+    #x: int
+    #y: int
+    #dying: boolean
+    +setImage(image: Image)
+    +getImage(): Image
+    +die()
+}
+
+class Commons {
+    BOARD_WIDTH: int
+    BOARD_HEIGHT: int
+    GROUND: int
+}
+
+Board --> Alien: contains
+Board --> Player: contains
+Board --> Shot: contains
+Board --> Bomb: uses
+Board --> GameOver: uses
+Board --> Won: uses
+
+Alien --|> Sprite
+Player --|> Sprite
+Shot --|> Sprite
+
+Alien --> Bomb: contains
+Board --> Commons: implements
+
+note right of Board
+    BEFORE PATTERNS:
+    - All rendering logic in Board
+    - paint() has 50+ lines
+    - drawAliens(), drawPlayer(), drawShot(), 
+      drawBombing() scattered
+    - Each sprite loads its own images
+    - No reusable components
+    - High coupling between game logic 
+      and rendering
+end note
+
+note bottom
+    PROBLEMS:
+    1. Memory waste: Each sprite loads images separately
+    2. Code complexity: Rendering logic scattered
+    3. Hard to maintain: Changes to rendering affect Board
+    4. No abstraction: All details exposed
+    5. No factory pattern: Aliens created manually
+end note
+
+@enduml
