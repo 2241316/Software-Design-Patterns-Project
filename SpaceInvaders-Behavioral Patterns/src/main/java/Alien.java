@@ -3,6 +3,7 @@ public abstract class Alien extends Sprite implements Cloneable {
     private final String alienImg = "/img/alien.png";
 
     public Alien(int x, int y) {
+        // Initialize alien with image from cache
         setX(x);
         setY(y);
         setImage(new javax.swing.ImageIcon(getClass().getResource(alienImg)).getImage());
@@ -13,13 +14,7 @@ public abstract class Alien extends Sprite implements Cloneable {
         return bomb;
     }
 
-    // -------------------------------------------------------------
-    // DESIGN PATTERN: Prototype (Creational)
-    // -------------------------------------------------------------
-    // This class implements the Prototype pattern by overriding the
-    // clone() method. This allows creating new Alien instances by
-    // copying an existing one (the prototype) rather than creating
-    // them from scratch, which is efficient for managing many similar objects.
+    // Prototype pattern - clone creates independent copies
     @Override
     public Alien clone() {
         try {
@@ -31,21 +26,12 @@ public abstract class Alien extends Sprite implements Cloneable {
         }
     }
 
-    // -------------------------------------------------------------
-    // DESIGN PATTERN: Template Method (Behavioral)
-    // -------------------------------------------------------------
-    // The 'act' method defines the skeleton of the algorithm.
-    // It enforces a sequence of steps (like checking visibility, etc.)
-    // while deferring the specific movement logic 'performMove' to subclasses.
+    // Template Method - skeleton of movement algorithm
     public final void act(int direction) {
-        // Common step: update internal state or prepare
-
-        // Delegated step: specific movement logic implemented by subclasses
+        // Delegates specific movement to subclass implementation
         performMove(direction);
-
-        // Any other common steps could go here
     }
 
-    // Abstract method to be implemented by subclasses
+    // Abstract method for subclasses to implement movement behavior
     protected abstract void performMove(int direction);
 }

@@ -7,7 +7,6 @@ import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Random;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -36,26 +35,16 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
     private StateManager stateManager;
 
     public Board() {
-        // -------------------------------------------------------------
-        // REPLACED ADAPTER WITH DIRECT LISTENER
-        // -------------------------------------------------------------
-        // DESIGN PATTERN: Flyweight (Structural) - Usage is in image loading below
+        // Setup input and display
         addKeyListener(new KeyboardHandler());
         setFocusable(true);
         d = new Dimension(BOARD_WIDTH, BOARD_HEIGTH);
         setBackground(Color.black);
 
-        // -------------------------------------------------------------
-        // DESIGN PATTERN: Facade (Structural) - Usage
-        // -------------------------------------------------------------
-        // Using the GameRenderer facade simplifies our paint/render logic.
+        // Initialize rendering facade
         renderer = new GameRenderer(this, d);
-
-        // -------------------------------------------------------------
-        // DESIGN PATTERN: State (Behavioral)
-        // -------------------------------------------------------------
-        // StateManager handles the transitions between game states
-        // (Playing, Menu, Game Over).
+        
+        // Initialize game state manager
         stateManager = new StateManager();
         stateManager.setState(new PlayingState(this));
 
@@ -68,7 +57,6 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
         gameInit();
     }
 
-    // PATTERN: State - Implementing GameBehavior interface for state callbacks
     @Override
     public void cycle() {
         animationCycle();
@@ -80,30 +68,24 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
     }
 
     public void gameInit() {
+        // Initialize game entities using factories and prototypes
         aliens = new ArrayList<>();
-        // -------------------------------------------------------------
-        // DESIGN PATTERN: Flyweight (Structural) - Usage
-        // -------------------------------------------------------------
-        // Use ImageCache to get shared image instances (Flyweight)
         Alien prototypeAlien = new StraightAlien(alienX, alienY);
         prototypeAlien.setImage(ImageCache.getImage(alienpix));
 
-        // -------------------------------------------------------------
-        // DESIGN PATTERN: Factory Method (Creational) - Usage
-        // -------------------------------------------------------------
-        // Using the factory to create alien instances.
         alienFactory = new AlienFactory(prototypeAlien);
         Shot prototypeShot = new Shot(0, 0);
         shotFactory = new ShotFactory(prototypeShot);
 
+        // Create 4x6 grid of aliens
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 6; j++) {
-                // PATTERN: Factory & Prototype - creating copies from prototype
                 Alien alien = alienFactory.createAlien(alienX + 18 * j, alienY + 18 * i);
                 aliens.add(alien);
             }
         }
 
+        // Initialize player and start animation thread
         player = new Player();
         shot = shotFactory.createShot(player.getX(), player.getY());
         if (animator == null || !ingame) {
@@ -113,10 +95,8 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
     }
 
     public void drawAliens(Graphics g) {
-        // PATTERN: Iterator - Iterating over alien list
-        Iterator<Alien> it = aliens.iterator();
-        while (it.hasNext()) {
-            Alien alien = it.next();
+        // Draw all visible aliens and handle death animations
+        for (Alien alien : aliens) {
             if (alien.isVisible()) {
                 g.drawImage(alien.getImage(), alien.getX(), alien.getY(), this);
             }
@@ -127,6 +107,7 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
     }
 
     public void drawPlayer(Graphics g) {
+        // Render player and check for death state
         if (player.isVisible()) {
             g.drawImage(player.getImage(), player.getX(), player.getY(), this);
         }
@@ -143,9 +124,8 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
     }
 
     public void drawBombing(Graphics g) {
-        Iterator<Alien> i3 = aliens.iterator();
-        while (i3.hasNext()) {
-            Alien a = i3.next();
+        // Draw bombs dropped by aliens
+        for (Alien a : aliens) {
             Bomb b = a.getBomb();
             if (!b.isDestroyed()) {
                 g.drawImage(b.getImage().getImage(), b.getX(), b.getY(), this);
@@ -154,6 +134,7 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
     }
 
     public void paint(Graphics g) {
+        // Main rendering - delegates to facade
         super.paint(g);
         if (ingame) {
             renderer.renderGameplay(g, aliens, player, shot, expl);
@@ -168,31 +149,33 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
     }
 
     public void gameOver() {
+        // Display game over screen
         Graphics g = this.getGraphics();
         renderer.renderGameOver(g, havewon, message);
         renderer.finishRendering(g);
     }
 
     public void animationCycle() {
+        // Check win condition
         if (deaths == NUMBER_OF_ALIENS_TO_DESTROY) {
             ingame = false;
             message = "Parabéns! Você salvou a galáxia!";
         }
+        
+        // Update player movement
         player.act();
+        
+        // Handle shot collision with aliens
         if (shot.isVisible()) {
-            Iterator<Alien> it = aliens.iterator();
             int shotX = shot.getX();
             int shotY = shot.getY();
-            while (it.hasNext()) {
-                Alien alien = it.next();
+            for (Alien alien : aliens) {
                 int alienX = alien.getX();
                 int alienY = alien.getY();
                 if (alien.isVisible() && shot.isVisible()) {
                     if (shotX >= (alienX) && shotX <= (alienX + ALIEN_WIDTH)
                             && shotY >= (alienY)
                             && shotY <= (alienY + ALIEN_HEIGHT)) {
-
-                        // Flyweight usage
                         alien.setImage(ImageCache.getImage(expl));
                         alien.setDying(true);
                         deaths++;
@@ -200,6 +183,7 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
                     }
                 }
             }
+            // Move shot upward
             int y = shot.getY();
             y -= 8;
             if (y < 0)
@@ -207,30 +191,26 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
             else
                 shot.setY(y);
         }
-        Iterator<Alien> it1 = aliens.iterator();
-        while (it1.hasNext()) {
-            Alien a1 = it1.next();
+        
+        // Handle alien movement and boundary checking
+        for (Alien a1 : aliens) {
             int x = a1.getX();
             if (x >= BOARD_WIDTH - BORDER_RIGHT && direction != -1) {
                 direction = -1;
-                Iterator<Alien> i1 = aliens.iterator();
-                while (i1.hasNext()) {
-                    Alien a2 = i1.next();
+                for (Alien a2 : aliens) {
                     a2.setY(a2.getY() + GO_DOWN);
                 }
             }
             if (x <= BORDER_LEFT && direction != 1) {
                 direction = 1;
-                Iterator<Alien> i2 = aliens.iterator();
-                while (i2.hasNext()) {
-                    Alien a = i2.next();
+                for (Alien a : aliens) {
                     a.setY(a.getY() + GO_DOWN);
                 }
             }
         }
-        Iterator<Alien> it = aliens.iterator();
-        while (it.hasNext()) {
-            Alien alien = it.next();
+        
+        // Update alien positions and check if they reached ground
+        for (Alien alien : aliens) {
             if (alien.isVisible()) {
                 int y = alien.getY();
                 if (y > GROUND - ALIEN_HEIGHT) {
@@ -241,17 +221,19 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
                 alien.act(direction);
             }
         }
-        Iterator<Alien> i3 = aliens.iterator();
+        
+        // Handle bomb logic for each alien
         Random generator = new Random();
-        while (i3.hasNext()) {
+        for (Alien a : aliens) {
             int shot = generator.nextInt(15);
-            Alien a = i3.next();
             Bomb b = a.getBomb();
+            // Randomly fire bombs
             if (shot == CHANCE && a.isVisible() && b.isDestroyed()) {
                 b.setDestroyed(false);
                 b.setX(a.getX());
                 b.setY(a.getY());
             }
+            // Check bomb collision with player
             int bombX = b.getX();
             int bombY = b.getY();
             int playerX = player.getX();
@@ -261,12 +243,12 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
                         && bombY >= (playerY)
                         && bombY <= (playerY + PLAYER_HEIGHT)) {
                     b.explode();
-                    // Flyweight usage
                     player.setImage(ImageCache.getImage("/img/explosion.png"));
                     player.setDying(true);
                     b.setDestroyed(true);
                 }
             }
+            // Move bomb downward
             if (!b.isDestroyed()) {
                 b.setY(b.getY() + 1);
                 if (b.getY() >= GROUND - BOMB_HEIGHT) {
@@ -278,14 +260,15 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
     }
 
     public void run() {
+        // Main game loop with fixed frame rate
         long beforeTime, timeDiff, sleep;
         beforeTime = System.currentTimeMillis();
 
         while (ingame) {
             repaint();
-            // State Pattern: Delegate input/update to StateManager
             stateManager.update();
 
+            // Control frame rate
             timeDiff = System.currentTimeMillis() - beforeTime;
             sleep = DELAY - timeDiff;
             if (sleep < 0)
@@ -298,15 +281,11 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
             beforeTime = System.currentTimeMillis();
         }
 
-        // State Pattern: Game Over
+        // End game - switch to game over state
         stateManager.setState(new GameOverState(this));
         stateManager.update();
     }
 
-    // -------------------------------------------------------------
-    // REMOVED ADAPTER PATTERN
-    // -------------------------------------------------------------
-    // Replaced KeyAdapter (Adapter) with direct KeyListener implementation
     private class KeyboardHandler implements java.awt.event.KeyListener {
         public void keyTyped(KeyEvent e) {
             // Not used
@@ -317,11 +296,13 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
         }
 
         public void keyPressed(KeyEvent e) {
+            // Handle player input
             player.keyPressed(e);
             int x = player.getX();
             int y = player.getY();
             if (ingame) {
                 int key = e.getKeyCode();
+                // Fire shot on spacebar
                 if (key == KeyEvent.VK_SPACE) {
                     if (!shot.isVisible())
                         shot = shotFactory.createShot(x, y);

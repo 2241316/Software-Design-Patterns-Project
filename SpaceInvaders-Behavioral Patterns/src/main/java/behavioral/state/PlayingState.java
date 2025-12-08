@@ -1,5 +1,6 @@
 package behavioral.state;
 
+// Playing state - active game loop
 public class PlayingState implements GameState {
     private GameBehavior behavior;
 
@@ -9,9 +10,10 @@ public class PlayingState implements GameState {
 
     @Override
     public void handleInput() {
-        // Input handling remains in Board for now due to restrictions
+        // Input handling handled separately
     }
 
+    // Run game animation cycle
     @Override
     public void update() {
         behavior.cycle();

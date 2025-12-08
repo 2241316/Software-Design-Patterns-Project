@@ -4,15 +4,15 @@ import javax.swing.ImageIcon;
 import java.awt.Image;
 import java.net.URL;
 
-// DESIGN PATTERN: Flyweight (Structural)
-// The ImageCache stores shared Image objects to reduce memory usage.
-// Instead of loading a new Image for every object, we reuse existing ones.
+// Flyweight pattern - reuses shared image instances to save memory
 public class ImageCache {
     private static Map<String, Image> imageMap = new HashMap<>();
 
+    // Get image from cache or load if not cached
     public static Image getImage(String path) {
         if (!imageMap.containsKey(path)) {
             try {
+                // Load image from resources
                 URL url = ImageCache.class.getResource(path);
                 if (url != null) {
                     ImageIcon ii = new ImageIcon(url);
@@ -26,6 +26,7 @@ public class ImageCache {
                 return null;
             }
         }
+        // Return cached image instance
         return imageMap.get(path);
     }
 }

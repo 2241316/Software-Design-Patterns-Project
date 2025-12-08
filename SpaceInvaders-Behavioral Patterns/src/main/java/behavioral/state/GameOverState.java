@@ -1,5 +1,6 @@
 package behavioral.state;
 
+// Game over state - display results
 public class GameOverState implements GameState {
     private GameBehavior behavior;
 
@@ -9,9 +10,10 @@ public class GameOverState implements GameState {
 
     @Override
     public void handleInput() {
-        // Restart logic could go here
+        // Could implement restart logic here
     }
 
+    // Show game over screen
     @Override
     public void update() {
         behavior.gameOverLogic();
