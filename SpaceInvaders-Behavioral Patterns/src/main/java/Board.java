@@ -37,11 +37,10 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
 
     public Board() {
         // -------------------------------------------------------------
-        // DESIGN PATTERN: Adapter (Structural)
+        // REPLACED ADAPTER WITH DIRECT LISTENER
         // -------------------------------------------------------------
-        // We register TAdapter, which adapts the KeyAdapter interface
-        // to handle specific game key events.
-        addKeyListener(new TAdapter());
+        // DESIGN PATTERN: Flyweight (Structural) - Usage is in image loading below
+        addKeyListener(new KeyboardHandler());
         setFocusable(true);
         d = new Dimension(BOARD_WIDTH, BOARD_HEIGTH);
         setBackground(Color.black);
@@ -83,22 +82,11 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
     public void gameInit() {
         aliens = new ArrayList<>();
         // -------------------------------------------------------------
-        // DESIGN PATTERN: Prototype (Creational) - Usage
+        // DESIGN PATTERN: Flyweight (Structural) - Usage
         // -------------------------------------------------------------
-        // We create a single 'prototypeAlien' instance here.
-        // The factory will later clone this instance to create the swarm.
+        // Use ImageCache to get shared image instances (Flyweight)
         Alien prototypeAlien = new StraightAlien(alienX, alienY);
-
-        try {
-            java.net.URL imgURL = this.getClass().getResource(alienpix);
-            if (imgURL != null) {
-                // Image loading for prototype
-                ImageIcon ii = new ImageIcon(imgURL);
-                prototypeAlien.setImage(ii.getImage());
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading image in gameInit: " + alienpix);
-        }
+        prototypeAlien.setImage(ImageCache.getImage(alienpix));
 
         // -------------------------------------------------------------
         // DESIGN PATTERN: Factory Method (Creational) - Usage
@@ -203,8 +191,9 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
                     if (shotX >= (alienX) && shotX <= (alienX + ALIEN_WIDTH)
                             && shotY >= (alienY)
                             && shotY <= (alienY + ALIEN_HEIGHT)) {
-                        ImageIcon ii = new ImageIcon(getClass().getResource(expl));
-                        alien.setImage(ii.getImage());
+
+                        // Flyweight usage
+                        alien.setImage(ImageCache.getImage(expl));
                         alien.setDying(true);
                         deaths++;
                         shot.die();
@@ -272,7 +261,8 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
                         && bombY >= (playerY)
                         && bombY <= (playerY + PLAYER_HEIGHT)) {
                     b.explode();
-                    player.setImage(new ImageIcon(getClass().getResource("/img/explosion.png")).getImage());
+                    // Flyweight usage
+                    player.setImage(ImageCache.getImage("/img/explosion.png"));
                     player.setDying(true);
                     b.setDestroyed(true);
                 }
@@ -314,11 +304,14 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
     }
 
     // -------------------------------------------------------------
-    // DESIGN PATTERN: Adapter (Structural)
+    // REMOVED ADAPTER PATTERN
     // -------------------------------------------------------------
-    // TAdapter (Target Adapter) extends the KeyAdapter class (Adapter).
-    // It translates raw keyboard events into game actions.
-    private class TAdapter extends KeyAdapter {
+    // Replaced KeyAdapter (Adapter) with direct KeyListener implementation
+    private class KeyboardHandler implements java.awt.event.KeyListener {
+        public void keyTyped(KeyEvent e) {
+            // Not used
+        }
+
         public void keyReleased(KeyEvent e) {
             player.keyReleased(e);
         }
