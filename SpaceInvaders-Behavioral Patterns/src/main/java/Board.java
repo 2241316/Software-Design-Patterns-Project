@@ -20,8 +20,6 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
     private ArrayList<Alien> aliens;
     private Player player;
     private Shot shot;
-    private GameOver gameend;
-    private Won vunnet;
     private int alienX = 150;
     private int alienY = 25;
     private int direction = -1;
@@ -38,17 +36,27 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
     private StateManager stateManager;
 
     public Board() {
-        // PATTERN: Adapter - TAdapter extends KeyAdapter to adapt keyboard events
+        // -------------------------------------------------------------
+        // DESIGN PATTERN: Adapter (Structural)
+        // -------------------------------------------------------------
+        // We register TAdapter, which adapts the KeyAdapter interface
+        // to handle specific game key events.
         addKeyListener(new TAdapter());
         setFocusable(true);
         d = new Dimension(BOARD_WIDTH, BOARD_HEIGTH);
         setBackground(Color.black);
 
-        // PATTERN: Facade - GameRenderer simplifies graphics operations
+        // -------------------------------------------------------------
+        // DESIGN PATTERN: Facade (Structural) - Usage
+        // -------------------------------------------------------------
+        // Using the GameRenderer facade simplifies our paint/render logic.
         renderer = new GameRenderer(this, d);
 
-        // PATTERN: State - StateManager controls the game flow (Playing, Menu,
-        // GameOver)
+        // -------------------------------------------------------------
+        // DESIGN PATTERN: State (Behavioral)
+        // -------------------------------------------------------------
+        // StateManager handles the transitions between game states
+        // (Playing, Menu, Game Over).
         stateManager = new StateManager();
         stateManager.setState(new PlayingState(this));
 
@@ -74,8 +82,11 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
 
     public void gameInit() {
         aliens = new ArrayList<>();
-        // PATTERN: Template Method - Using concrete implementations (StraightAlien)
-        // PATTERN: Prototype - Creating a prototype instance to be cloned
+        // -------------------------------------------------------------
+        // DESIGN PATTERN: Prototype (Creational) - Usage
+        // -------------------------------------------------------------
+        // We create a single 'prototypeAlien' instance here.
+        // The factory will later clone this instance to create the swarm.
         Alien prototypeAlien = new StraightAlien(alienX, alienY);
 
         try {
@@ -89,7 +100,10 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
             System.err.println("Error loading image in gameInit: " + alienpix);
         }
 
-        // PATTERN: Factory Method - AlienFactory encapsulates object creation
+        // -------------------------------------------------------------
+        // DESIGN PATTERN: Factory Method (Creational) - Usage
+        // -------------------------------------------------------------
+        // Using the factory to create alien instances.
         alienFactory = new AlienFactory(prototypeAlien);
         Shot prototypeShot = new Shot(0, 0);
         shotFactory = new ShotFactory(prototypeShot);
@@ -133,10 +147,6 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
             havewon = false;
             ingame = false;
         }
-    }
-
-    public void drawGameEnd(Graphics g) {
-        g.drawImage(gameend.getImage(), 0, 0, this);
     }
 
     public void drawShot(Graphics g) {
@@ -303,6 +313,11 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
         stateManager.update();
     }
 
+    // -------------------------------------------------------------
+    // DESIGN PATTERN: Adapter (Structural)
+    // -------------------------------------------------------------
+    // TAdapter (Target Adapter) extends the KeyAdapter class (Adapter).
+    // It translates raw keyboard events into game actions.
     private class TAdapter extends KeyAdapter {
         public void keyReleased(KeyEvent e) {
             player.keyReleased(e);

@@ -10,9 +10,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 /**
- * Facade pattern: Simplifies the rendering complexity of the game board.
- * Provides a cleaner interface for drawing game entities without exposing
- * the complex logic of individual draw methods.
+ * -------------------------------------------------------------
+ * DESIGN PATTERN: Facade (Structural)
+ * -------------------------------------------------------------
+ * This class acts as a Facade for the rendering subsystem.
+ * It hides the complexity of Graphics operations, drawing individual
+ * entities, and handling screen clearing behind a simple interface
+ * (renderGameplay, renderGameOver).
  */
 public class GameRenderer implements Commons {
     private final JPanel panel;
@@ -28,7 +32,7 @@ public class GameRenderer implements Commons {
      * Facade method that consolidates all drawing logic.
      */
     public void renderGameplay(Graphics g, ArrayList<Alien> aliens, Player player,
-                               Shot shot, String explosionPath) {
+            Shot shot, String explosionPath) {
         clearScreen(g);
         drawGameBoundary(g);
         drawAliens(g, aliens);

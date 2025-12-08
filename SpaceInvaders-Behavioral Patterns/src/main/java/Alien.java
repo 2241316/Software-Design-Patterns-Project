@@ -13,9 +13,15 @@ public abstract class Alien extends Sprite implements Cloneable {
         return bomb;
     }
 
+    // -------------------------------------------------------------
+    // DESIGN PATTERN: Prototype (Creational)
+    // -------------------------------------------------------------
+    // This class implements the Prototype pattern by overriding the
+    // clone() method. This allows creating new Alien instances by
+    // copying an existing one (the prototype) rather than creating
+    // them from scratch, which is efficient for managing many similar objects.
     @Override
     public Alien clone() {
-        // PATTERN: Prototype - Returns a copy of the alien
         try {
             Alien cloned = (Alien) super.clone();
             cloned.bomb = bomb.clone();
@@ -25,7 +31,12 @@ public abstract class Alien extends Sprite implements Cloneable {
         }
     }
 
-    // PATTERN: Template Method - Defines the skeleton of the algorithm (act)
+    // -------------------------------------------------------------
+    // DESIGN PATTERN: Template Method (Behavioral)
+    // -------------------------------------------------------------
+    // The 'act' method defines the skeleton of the algorithm.
+    // It enforces a sequence of steps (like checking visibility, etc.)
+    // while deferring the specific movement logic 'performMove' to subclasses.
     public final void act(int direction) {
         // Common step: update internal state or prepare
 

@@ -42,9 +42,10 @@ public class ImageCache {
     }
 
     private Image createPlaceholderImage(int width, int height) {
-        java.awt.image.BufferedImage bi = new java.awt.image.BufferedImage(width, height, java.awt.image.BufferedImage.TYPE_INT_RGB);
+        java.awt.image.BufferedImage bi = new java.awt.image.BufferedImage(width, height,
+                java.awt.image.BufferedImage.TYPE_INT_RGB);
         return bi;
     }
 
-    // COMMENT: Flyweight pattern - shares Image objects across sprites
+    // (Note: This class internally helps with memory management)
 }

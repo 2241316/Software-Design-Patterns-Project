@@ -1,5 +1,13 @@
 package behavioral.state;
 
+/**
+ * -------------------------------------------------------------
+ * DESIGN PATTERN: State (Behavioral)
+ * -------------------------------------------------------------
+ * This class serves as the Context in the State pattern.
+ * It maintains a reference to an instance of a GameState subclass,
+ * which represents the current state of the game.
+ */
 public class StateManager {
     private GameState currentState;
 
