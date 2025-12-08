@@ -5,7 +5,7 @@ public abstract class Alien extends Sprite implements Cloneable {
     public Alien(int x, int y) {
         setX(x);
         setY(y);
-        setImage(ImageCache.getInstance().getImage(alienImg));
+        setImage(new javax.swing.ImageIcon(getClass().getResource(alienImg)).getImage());
         bomb = new Bomb(x, y);
     }
 

@@ -5,7 +5,7 @@ public class GameOver extends Sprite implements Commons, Cloneable {
     private int width;
 
     public GameOver() {
-        java.awt.Image img = ImageCache.getInstance().getImage(gameOverImg);
+        java.awt.Image img = new ImageIcon(getClass().getResource(gameOverImg)).getImage();
         width = img.getWidth(null);
         setImage(img);
         setX(0);
@@ -21,6 +21,11 @@ public class GameOver extends Sprite implements Commons, Cloneable {
         }
     }
 
-    public int getWidth() { return width; }
-    public void setWidth(int width) { this.width = width; }
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
 }

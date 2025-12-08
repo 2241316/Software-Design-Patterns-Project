@@ -4,14 +4,17 @@ public class Shot extends Sprite implements Cloneable {
     private final String shotImg = "/img/shot.png";
     private final int HSPACE = 6;
     private final int VSPACE = 1;
+
     public Shot() {
-        setImage(ImageCache.getInstance().getImage(shotImg));
+        setImage(new ImageIcon(getClass().getResource(shotImg)).getImage());
     }
+
     public Shot(int x, int y) {
         this();
         setX(x + HSPACE);
         setY(y - VSPACE);
     }
+
     @Override
     public Shot clone() {
         try {

@@ -92,7 +92,7 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
         try {
             java.net.URL imgURL = this.getClass().getResource(alienpix);
             if (imgURL != null) {
-                // PATTERN: Flyweight - Image loaded once and reused via Prototype
+                // Image loading for prototype
                 ImageIcon ii = new ImageIcon(imgURL);
                 prototypeAlien.setImage(ii.getImage());
             }
@@ -272,7 +272,7 @@ public class Board extends JPanel implements Runnable, Commons, GameBehavior {
                         && bombY >= (playerY)
                         && bombY <= (playerY + PLAYER_HEIGHT)) {
                     b.explode();
-                    player.setImage(ImageCache.getInstance().getImage("/img/explosion.png"));
+                    player.setImage(new ImageIcon(getClass().getResource("/img/explosion.png")).getImage());
                     player.setDying(true);
                     b.setDestroyed(true);
                 }
